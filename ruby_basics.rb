@@ -264,3 +264,31 @@ class SongList
 end
 puts list["what"]
 
+#iterations in ruby
+
+def iterations
+	yield
+	yield
+end
+iterations {puts "Thsi is printed twice"}
+
+def fib(max)
+	x, y  = 1, 1
+	while(x <= max)
+		yield x
+		x, y = y, x+y
+	end
+end
+fib(10) {|f| puts "#{f}"}
+
+class Array
+  def find
+    for i in 0...size
+      value = self[i]
+      #puts size
+      return value if yield(value)
+    end
+    return nil
+  end
+end
+p [1, 3, 5, 7, 9].find {|v| v*v > 30 }
