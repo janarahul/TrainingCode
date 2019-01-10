@@ -64,7 +64,7 @@ def call_back
 	yield
 	yield
 end
-call_back { puts "This is in a bloack"}
+call_back { puts "This is in a block"}
 
 a = %w(ant bee fly)
 a.each do |insect|
@@ -239,7 +239,7 @@ class SongList
 end
 
 list = SongList.new
-list.append(Song.new("what","TS",1).plays).append(Song.new("you","TS",2).plays.plays)
+#list.append(Song.new("what","TS",1).plays).append(Song.new("you","TS",2).plays.plays)
 
 class SongList
 	def [](key)
@@ -279,7 +279,10 @@ def fib(max)
 		x, y = y, x+y
 	end
 end
-fib(10) {|f| puts "#{f}"}
+fib(100) { |f| printf "#{f} "}
+
+
+
 
 class Array
   def find
@@ -292,3 +295,136 @@ class Array
   end
 end
 p [1, 3, 5, 7, 9].find {|v| v*v > 30 }
+
+[1, 2, 3, 4].each {|p| print p}
+#.collect results retureed are used to make a new array
+p [1 ,2, 3, 4 ].collect {|p| p+1}
+
+f = File.open("textfile.txt")
+f.each do |line|
+	puts line
+end
+f.close
+
+class Array
+	def inject(n)
+		self.each {|value| n = yield(n, value)}
+		n
+	end
+	def sum
+		inject(0) {|n, value| n+value}
+	end
+end
+p [1, 2, 3, 4].sum
+
+class File
+	def File.openAndProcess(*args)
+		f = File.open(*args)
+		yield f
+		f.close
+	end
+end
+File.openAndProcess("textfile.txt", "r") {|f| f.gets}
+
+class File
+	def File.myOpen(*args)
+		f = File.open(*args)
+		if block_given?
+			yield f
+			f.close()
+			f = nil
+		else 
+			return f
+		end
+	end
+end
+
+file = File.myOpen("textfile.txt", "r")
+puts file.gets
+
+3.times {|i| puts i}
+3.upto(7) {|i| puts i}
+3.downto(1) {|i| puts i}
+3.step(8,2) {|i| puts i}
+
+
+#settings delimiter for strings 
+# done using %q %Q 
+#here document
+document = <<HERE
+This is a here document
+Example!
+HERE
+puts document
+greeting = <<HERE + <<THERE + "World"
+Hello
+HERE
+There
+THERE
+puts greeting
+
+p %{a word}  # => "a word"
+p %Q{a word} # => "a word"
+p %q{a word} 
+
+songFile = File.open("textfile.txt", "r")
+
+songs = SongList.new
+songFile.each do |line|
+  file, length, name, title = line.chomp.split(/\s*\|\s*/)
+  name.squeeze!(" ")
+  mins, secs = length.scan(/\d+/)
+  songs.append Song.new(title, name, mins.to_i*60+secs.to_i)
+end
+p songs[1]
+
+def showRE(string, pattern)
+	if string =~ pattern
+		puts "#{$`}<<#{$&}>>#{$'}"
+	else
+		puts "no match"
+	end
+end
+showRE("interesting",/t/)
+
+#RE all character match itself expect ., |, (, ), [, {, +, \, ^, $, *, and ? 
+
+#RE anchor ^ $ \A \z
+showRE('Mississippi', /(\w+)\1/)
+showRE('He said "Helllo"', /(\w)\1/)
+
+str = 'a\b\c'
+p str.gsub(/\\/, '\\\\')
+
+#Ranges 
+for i in 0..5
+	puts i
+end
+for i in 0...5
+	puts i
+end
+
+class VU
+  include Comparable
+ 
+  attr :volume
+  def initialize(volume)  # 0..9
+    @volume = volume
+  end
+  def inspect
+    '#' * @volume
+  end
+  # Support for ranges
+  def <=>(other)
+    self.volume <=> other.volume
+  end
+
+
+  def succ
+    raise(IndexError, "Volume too big") if @volume >= 9
+    VU.new(@volume.succ)
+  end
+end
+medium = VU.new(4)..VU.new(7)
+p medium.to_a 	
+p medium.include?(VU.new(3))
