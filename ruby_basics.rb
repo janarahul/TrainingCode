@@ -306,7 +306,7 @@ f.each do |line|
 end
 f.close
 
-class Array
+module Inject
 	def inject(n)
 		self.each {|value| n = yield(n, value)}
 		n
@@ -315,6 +315,10 @@ class Array
 		inject(0) {|n, value| n+value}
 	end
 end
+class Array
+	include Inject
+end
+
 p [1, 2, 3, 4].sum
 
 class File
@@ -428,3 +432,232 @@ end
 medium = VU.new(4)..VU.new(7)
 p medium.to_a 	
 p medium.include?(VU.new(3))
+
+#More on Methods 
+def varArgs(arg1, *rest )
+	puts "#{arg1} #{rest.join(", ")}"
+end
+
+varArgs("one")
+varArgs("one", "two")
+
+#Example on block passed as proc object
+class TaxCalculator
+	def initialize(name, &procblock)
+		@name = name
+		@procblock = procblock
+	end
+	def getTax(value)
+		"#@name is = #{ @procblock.call(value) }"
+	end
+end
+
+
+tc = TaxCalculator.new("Sales tax") { |amt| amt * 0.075 }
+p tc.getTax(100)
+
+def fiveArgs(a, b, c, d, e)
+	puts "#{a} #{b} #{c} #{d} #{e}"
+end
+fiveArgs(*(0...5))
+
+#Dynamic blocks
+
+times = 't'
+if times =~ /^t/
+	calc = proc { |n| n*n}
+else
+	calc = proc {|n| n+n }
+end
+
+p (0..5).collect(&calc)
+
+#Expresions
+
+puts [ 3, 1, 7, 0 ].sort.reverse
+a = b = c =10
+puts (a.*(b)).+(c)
+
+#commands expression
+puts %x{echo "Hello there"}
+#print `data`
+
+'''
+When an assignment has more than one lvalue,
+the assignment expression returns an array of
+the rvalues. If an assignment contains more lvalues than rvalues,
+the excess lvalues are set to nil. If a multiple assignment contains
+more rvalues than lvalues, the extra rvalues are ignored.
+As of Ruby 1.6.2, if an assignment has one lvalue and multiple rvalues,
+the rvalues are converted to an array and assigned to the lvalue. 
+'''
+#case statement
+
+year =2019
+
+kind = case year
+         when 1850..1889 then "Blues"
+         when 1890..1909 then "Ragtime"
+         when 1910..1929 then "New Orleans Jazz"
+         when 1930..1939 then "Swing"
+         when 1940..1950 then "Bebop"
+         else                 "Jazz"
+       end
+print kind
+
+
+def doUntil(cond)
+  yield
+  retry unless cond
+end
+
+
+i = 0
+doUntil(i > 3) {
+  print i, " "
+  i += 1
+}
+
+#Exceptions
+
+'''opFile = File.open("textfile.txt", "w")
+begin 
+
+	while data = socket.read(512)
+    	opFile.write(data)
+  	end
+
+rescue NameError
+	$stderr.print "IO fialed "+ $!
+	opFile.close
+	#File.delete("textfile.txt")
+	#raise	
+end
+'''
+#MIXIN
+
+module Debug
+  def whoAmI?
+    "#{self.type.name} (\##{self.id}): #{self.to_s}"
+  end
+end
+class Phonograph
+  include Debug
+  # ...
+  def initialize(name)
+  	@name = name
+  end
+  def to_s
+  	"#{@name}"
+  end
+
+end
+class EightTrack
+  include Debug
+  def initialize(name)
+  	@name = name
+  end
+  def to_s
+  	"#{@name}"
+  end
+  # ...
+end
+ph = Phonograph.new("West End Blues")
+et = EightTrack.new("Surrealistic Pillow")
+
+puts ph.whoAmI?
+puts et.whoAmI?
+
+class Song
+  include Comparable
+  def <=>(other)
+    self.duration <=> other.duration
+  end
+end
+
+song1 = Song.new("xyz", "abc", 250)
+song2 = Song.new("pqr", "rsst", 270)
+song3 = Song.new("pqrs", "st", 270)
+
+puts song2 == song3
+puts song1 == song3
+
+class Array
+  include Inject
+end
+
+puts [1, 2, 3, 4].sum
+
+module Notes
+	attr :concertA
+	def tuning(amt)
+		@concertA = 440.0 + amt
+	end
+end
+
+class Trumpet
+	include Notes
+	def initialize(tune)
+		tuning(tune)
+		puts "#{concertA}"
+		puts "#{@concertA}"
+	end
+end
+Trumpet.new(-5.3)
+
+module A
+  HELLO = "hi"
+  def sayhi
+    puts HELLO
+  end
+end
+
+module B
+  HELLO = "bye"
+  def sayhi
+    puts HELLO
+  end
+end
+
+class C
+  include B
+  include A
+end
+
+c = C.new
+c.sayhi
+
+def foo(bar) bar = 'reference' end; baz = 'value'; foo(baz); puts "Ruby is pass-by-#{baz}"
+
+def change_string(str)
+  str << " This "
+  str << " is "
+  str << " displayed "
+  str << " right?"
+  str = "What? I didn't say anything." # I'm so sneaky
+end
+
+be_nice_to_me = "hello"
+change_string(be_nice_to_me)
+puts be_nice_to_me
+
+
+h = Hash.new(0)  # New hash pairs will by default have 0 as values
+h[1] += 1  #=> {1=>1}
+h[2] += 2  #=> {2=>2}
+
+p h
+
+h = Hash.new{[]}  # Empty array as default value
+h[1] <<= 1  #=> {1=>[1]}                  ← Ok
+h[2] <<= 2  #=> {1=>[1,2], 2=>[1,2]}      ← Why did `1` change?
+h[3] << 3   #=> {1=>[1,2,3], 2=>[1,2,3]}  ← Where is `3`?
+p h
+
+h = Hash.new([])
+h[0] << 'a'  #=> ["a"]
+h[1] << 'b'  #=> ["a", "b"]
+h[1]         #=> ["a", "b"]
+
+h[0].object_id == h[1].object_id  #=> true
+p h  #=> {}
