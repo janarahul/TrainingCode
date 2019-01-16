@@ -9,14 +9,15 @@ class CreateProducts < ActiveRecord::Migration
     end
 
     change_table :products do |t|
-      t.remove :description, :name
+      t.remove :description, :name 
       t.string :part_number
       t.index :part_number
       t.rename :upccode, :upc_code
     end
+
     ''' #same as
     remove_column :products, :description
-    remove-column :products, :name
+    remove_column :products, :name
     add_column :products, :part_number, :string
     add_index :products, :part_number
     rename_column :products, :upccode, :upc_code

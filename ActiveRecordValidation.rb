@@ -55,4 +55,52 @@ end
 :allow_blank
 :message 
 :on
+# methods to work with errors
+#errors.add_to_base objects state not attrib
 
+class Person < ActiveRecord::Base
+	def a_method_for_validation
+		errors.add_to_base("Message")
+	end
+end
+#errors.add manually add error related to attrib
+
+class Person < ActiveRecord::Base
+	def a_validation_method
+		errors.add(:name, "Message")
+	end
+end
+
+#errors.on to get error message on a pariculat attrib
+#errors.clear just clears the errors map
+
+person = Person.new #doesnt call validations
+person.valid? #calls validations
+person.errors.on(:name)
+person.errors.clear #empties the errors
+ 
+person.save #save returns false even when the errors is empty as the validations are run 
+
+person.errors.size # return the no of errors currents for a object
+
+#Displaying errors in view
+
+class Person < ActiveRecord::Base
+	validates_presence_of :value, :description
+	validates_numericality_of :value, :allow_nil => true
+end
+
+<% form_for(@products) do |f| %>
+	<%= f.error_essages %>
+	<p>
+		<%= f.label :description %>
+		<%= f.text_field :description %>
+	</p>
+	<p>
+		<%= f.label :value %>
+		<%= f.text_field :value %>
+	</p>
+	<p>
+		<%= f.submit ""%>
+	</p>
+<% end %>
