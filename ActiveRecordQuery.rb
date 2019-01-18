@@ -114,4 +114,4 @@ Client.exists?(:first_name => 'Ryan') #similar to conditionals
 Client.exists? #w/o parameter checks if table empty or not
 
 #Calculations
-
+count, average, minimum, maximum, sum
