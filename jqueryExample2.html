@@ -1,0 +1,28 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+    
+</head>
+<body>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+	<div id="container">
+	    <ul id="list">
+	        <li><a href="http://domain1.com">Item #1</a></li>
+	        <li><a href="/local/path/1">Item #2</a></li>
+	        <li><a href="/local/path/2">Item #3</a></li>
+	        <li><a href="http://domain4.com">Item #4</a></li>
+	    </ul>
+	</div>
+	<script>
+		/*$( "#list" ).on( "click","a", function( event ) {
+    		event.preventDefault();
+   			console.log( $( this ).text() );
+		});*/
+		$( "#list" ).on( "click", "a[href^='http']", function( event ) {
+    		$( this ).attr( "target", "_blank" );
+			});
+		$( "#list" ).append( "<li><a href='http://newdomain.com'>Item #5</a></li>" );
+	</script>
+</body>
+</html>
